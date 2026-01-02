@@ -1,6 +1,6 @@
 /***********
- ID:
- NAME:
+ ID: 216763235
+ NAME: Maor Shvartz
 ***********/
 
 #include <stdio.h>
@@ -124,4 +124,75 @@ int main() {
         }
     } while (choice != 4);
     return 0;
+}
+
+//All Around Functions
+void expandDB(){
+    if (database == NULL){
+        database = (TVShow***)(malloc(sizeof(TVShow**)));
+        *database = (TVShow**)(malloc(sizeof(TVShow*)));
+        **database = (TVShow*)(malloc(sizeof(TVShow)));
+    }
+    else{
+        *database = (TVShow**)(realloc(*database,(dbSize + 1) * sizeof(TVShow*)));
+        for(int i = 0; i < dbSize; i++){
+            (*database)[i] = (TVShow*)(realloc((*database)[i],(dbSize + 1) * sizeof(TVShow)));
+        }
+        (*database)[dbSize] = (TVShow*)malloc((dbSize + 1) * sizeof(TVShow));
+    }
+    dbSize++;
+}
+
+
+//TV Show Functions
+TVShow *findShow(char *name){
+    for(int i = 0; i <dbSize; i++){
+        for (int j =0; j < dbSize; j++){
+            if(strcmp(database[i][j] -> name, name) == 0){
+                return database[i][j];
+            }
+        }
+    }
+    return NULL;
+}
+
+void addShow(){
+    char* name;
+    do
+    {
+        printf("Enter the name of the show:\n");
+        name = scanf("%s", name);
+        if(findShow(name) != NULL){
+            printf("Show already exists");
+        }
+    } while (findShow(name) != NULL);
+    
+    
+}
+
+
+
+//Season Functions
+Season *findSeason(TVShow *show, char *name){
+    Season *seasons = show -> seasons; 
+    while (seasons != NULL){
+        if (strcmp(seasons -> name, name) == 0){
+            return seasons;
+        }
+        seasons++;
+    }
+    return NULL;
+}
+
+
+// Episode Functions
+Episode *findEpisode(Season *season, char *name){
+    Episode *episodes = season -> episodes;
+    while (episodes != NULL){
+        if (strcmp(episodes -> name, name) == 0){
+            return episodes;
+        }
+        episodes++;
+    }
+    return NULL;
 }
