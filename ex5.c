@@ -371,7 +371,7 @@ void printArray(){
 TVShow *findShow(char *name){
     for(int i = 0; i <dbSize; i++){
         for (int j =0; j < dbSize; j++){
-            if(strcmp(database[i][j] -> name, name) == 0){
+            if(database[i][j] != NULL && strcmp(database[i][j] -> name, name) == 0){
                 return database[i][j];
             }
         }
