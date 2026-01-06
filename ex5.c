@@ -381,17 +381,13 @@ TVShow *findShow(char *name){
 
 void addShow(){
     char* name = NULL;
-    do
-    {
-        if (name != NULL){
-            free(name);
-        }
-        printf("Enter the name of the show:\n");
-        name = getString();
-        if (findShow(name) != NULL) {
-            printf("Show already exists\n");
-        }
-    } while (findShow(name) != NULL);
+    printf("Enter the name of the show:\n");
+    name = getString();
+    if (findShow(name) != NULL){
+        printf("Show already exists.\n");
+        free(name);
+        return;
+    }
     TVShow* pshow = (TVShow*)malloc(sizeof(TVShow));
     pshow ->name = name;
     pshow -> seasons = NULL;
