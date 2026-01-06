@@ -484,8 +484,8 @@ void addSeason(){
     int pos;
     printf("Enter the name of the show:\n");
     nameshow = getString();
-    if (findShow(nameshow) != NULL){
-        printf("Show already exists.\n");
+    if (findShow(nameshow) == NULL){
+        printf("Show not found.\n");
         free(nameshow);
         return;
     }
