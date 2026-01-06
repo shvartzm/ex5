@@ -176,15 +176,15 @@ void expandDB(){
 }
 
 void compressDB(){
-     free(((*database)[dbSize - 1])); // free last row
+     free(database[dbSize - 1]); // free last row
      for (int i = 0 ; i < dbSize -1; i++){
-        (*database)[i] == (TVShow*)realloc((*database)[i],(dbSize -1) * sizeof(TVShow*));
+        database[i] = (TVShow**)realloc(database[i],(dbSize - 1) * sizeof(TVShow*));
      }
      if (dbSize - 1 == 0 ){
-        free(*database);
-        *database = NULL;
+        free(database);
+        database = NULL;
      }else{
-        *database = (TVShow**)realloc(*database, (dbSize - 1) * sizeof(TVShow*));
+        database = (TVShow***)realloc(database, (dbSize - 1) * sizeof(TVShow**));
      }
      dbSize--;
 }
@@ -749,6 +749,7 @@ void freeEpisode(Episode *e){
     while(current != NULL){
         nextEpisode = current -> next;
         free(current -> name);
+        free(current -> length);
         free(current);
         current = nextEpisode;
     }
@@ -774,7 +775,15 @@ void freeShow(TVShow *t){
 void freeAll(){
     for(int i = 0; i < dbSize; i++){
         for(int j =0; j < dbSize; j++){
-            freeShow(database[i][j]);
+            if(database[i][j] != NULL){
+                freeShow(database[i][j]);
+            }
         }
+        free(database[i]);
     }
+    if(database!= NULL){
+        free(database);
+        database = NULL;
+    }
+    dbSize = 0;
 }
