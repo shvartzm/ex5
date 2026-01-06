@@ -611,17 +611,14 @@ void addEpisode(){
         return;
     }
 
-    do
-    {
-        if (episodelength != NULL){
-            free(episodelength);
-        }
-        printf("Enter the length (xx:xx:xx):\n");
+    printf("Enter the length (xx:xx:xx):\n");
+    episodelength = getString();
+    
+    while (!validLength(episodelength)) {
+        free(episodelength);
+        printf("Invalid length, enter again:\n");
         episodelength = getString();
-        if (!validLength(episodelength)){
-            printf("Invalid length, enter again:\n");
-        }
-    } while (!validLength(episodelength));
+    }
     printf("Enter the position:\n");
     scanf("%d", &pos);
     getchar();
