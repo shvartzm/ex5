@@ -482,17 +482,13 @@ void addSeason(){
     char* nameseason = NULL;
     TVShow* pshow;
     int pos;
-    do
-    {
-        if (nameshow != NULL){
-            free(nameshow);
-        }
-        printf("Enter the name of the show:\n");
-        nameshow = getString();
-        if (findShow(nameshow) == NULL){
-            printf("Show not found.\n");
-        }
-    } while (findShow(nameshow) == NULL);
+    printf("Enter the name of the show:\n");
+    nameshow = getString();
+    if (findShow(nameshow) != NULL){
+        printf("Show already exists.\n");
+        free(nameshow);
+        return;
+    }
     pshow = findShow(nameshow);
     free(nameshow);
     printf("Enter the name of the season:\n");
