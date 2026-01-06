@@ -545,17 +545,23 @@ void deleteSeason(){
     if (strcmp(pshow -> seasons -> name, nameseason) == 0){
         Season* temp = pshow -> seasons;
         pshow -> seasons = pshow -> seasons -> next;
-        freeSeason(temp);
+
+        freeEpisode(temp -> episodes);
+        free(temp -> name);
+        free(temp);
         free(nameseason);
         return;
     }
     Season* currSeason = pshow -> seasons;
-    while(strcmp(currSeason -> next -> name, nameseason) != 0){
+    while(currSeason->next != NULL && strcmp(currSeason -> next -> name, nameseason) != 0){
         currSeason = currSeason -> next;
     }
     Season* temp = currSeason -> next;
     currSeason -> next = temp -> next;
-    freeSeason(temp);
+
+    freeEpisode(temp -> episodes);
+    free(temp -> name);
+    free(temp);
     free(nameseason);
 }
 
@@ -678,17 +684,21 @@ void deleteEpisode(){
     if (strcmp(season -> episodes -> name, nameepisode) == 0){
         Episode* temp = season -> episodes;
         season -> episodes = season -> episodes -> next;
-        freeEpisode(temp);
+        free(temp->name);
+        free(temp->length);
+        free(temp);
         free(nameepisode);
         return;
     }
     Episode* currEpisode = season -> episodes;
-    while(strcmp(currEpisode -> next -> name, nameepisode) != 0){
+    while(currEpisode->next != NULL && strcmp(currEpisode -> next -> name, nameepisode) != 0){
         currEpisode = currEpisode -> next;
     }
     Episode* temp = currEpisode -> next;
     currEpisode -> next = temp -> next;
-    freeEpisode(temp);
+    free(temp->name);
+    free(temp->length);
+    free(temp);
     free(nameepisode);
 }
 
