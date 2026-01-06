@@ -472,7 +472,7 @@ Season *findSeason(TVShow *show, char *name){
         if (strcmp(seasons -> name, name) == 0){
             return seasons;
         }
-        seasons++;
+        seasons = seasons->next;
     }
     return NULL;
 }
@@ -574,7 +574,7 @@ Episode *findEpisode(Season *season, char *name){
         if (strcmp(episodes -> name, name) == 0){
             return episodes;
         }
-        episodes++;
+        episodes = episodes -> next;
     }
     return NULL;
 }
