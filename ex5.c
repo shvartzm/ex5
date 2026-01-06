@@ -408,17 +408,13 @@ void addShow(){
 }
 void deleteShow(){
     char* name = NULL;
-    do
-    {
-        if (name != NULL){
-            free(name);
-        }
-        printf("Enter the name of the show:\n");
-        name = getString();
-        if (findShow(name) == NULL){
-            printf("Show not found.");
-        }
-    } while (findShow(name) == NULL);
+    printf("Enter the name of the show:\n");
+    name = getString();
+    if (findShow(name) == NULL){
+        printf("Show not found.\n");
+        free(name);
+        return;
+    }
     for (int i = 0; i < dbSize; i++){
         for (int j = 0; j < dbSize; j++){
             if (database[i][j] != NULL && strcmp(database[i][j] -> name, name) == 0)
