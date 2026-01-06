@@ -6,7 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#define NUMBER_OF_LENGTH 2
+#define NUMBER_OF_HOURS 100
+#define NUMBER_OF_MINUTES_SECOND 60
 typedef struct Episode {
     char *name;
     char *length;
@@ -140,16 +142,16 @@ char *getString(){
     char c;
     int size = 0;
     scanf(" %c", &c);
-    input = (char*)malloc(sizeof(char));
+    input = (char*)malloc(sizeof(char));// mem alloc for first letter input
     input[size] = c;
     size++;
     
-    while((c = getchar()) != '\n' && c != EOF){
-        input =(char*) realloc(input,(size + 1) * sizeof(char));
+    while((c = getchar()) != '\n' && c != EOF){ 
+        input =(char*) realloc(input,(size + 1) * sizeof(char)); // mem alloc for each letter
         input[size] = c;
         size++;
     }
-    input = (char*)realloc(input,(size +1)* sizeof(char));
+    input = (char*)realloc(input,(size +1)* sizeof(char));// realloc for the end of string char
     input[size] = '\0';
     return input;
     
@@ -157,19 +159,19 @@ char *getString(){
 
 void expandDB(){
     if (database == NULL){
-        database = (TVShow***)(malloc(sizeof(TVShow**)));
-        database[0] = (TVShow**)(malloc(sizeof(TVShow*)));
-        database[0][0] = NULL;
+        database = (TVShow***)(malloc(sizeof(TVShow**))); // sets base level
+        database[0] = (TVShow**)(malloc(sizeof(TVShow*))); // sets row
+        database[0][0] = NULL; // initializes the singular pointer
     }
     else{
-        database = (TVShow***)(realloc(database,(dbSize + 1) * sizeof(TVShow**)));
+        database = (TVShow***)(realloc(database,(dbSize + 1) * sizeof(TVShow**))); // sets base level
         for(int i = 0; i < dbSize; i++){
-            database[i] = (TVShow**)(realloc((database)[i],(dbSize + 1) * sizeof(TVShow*)));
-            database[i][dbSize] = NULL;
+            database[i] = (TVShow**)(realloc((database)[i],(dbSize + 1) * sizeof(TVShow*))); // sets each row
+            database[i][dbSize] = NULL; // sets each pointer
         }
-        database[dbSize] = (TVShow**)malloc((dbSize + 1) * sizeof(TVShow*));
+        database[dbSize] = (TVShow**)malloc((dbSize + 1) * sizeof(TVShow*)); // adds last row
         for(int j = 0; j < dbSize + 1; j++){
-            database[dbSize][j] = NULL;
+            database[dbSize][j] = NULL; // sets the new collumn
         }
     }
     dbSize++;
@@ -178,13 +180,13 @@ void expandDB(){
 void compressDB(){
      free(database[dbSize - 1]); // free last row
      for (int i = 0 ; i < dbSize -1; i++){
-        database[i] = (TVShow**)realloc(database[i],(dbSize - 1) * sizeof(TVShow*));
+        database[i] = (TVShow**)realloc(database[i],(dbSize - 1) * sizeof(TVShow*)); // removes last collumn of each row
      }
-     if (dbSize - 1 == 0 ){
+     if (dbSize - 1 == 0 ){ // incase no database now
         free(database);
         database = NULL;
      }else{
-        database = (TVShow***)realloc(database, (dbSize - 1) * sizeof(TVShow**));
+        database = (TVShow***)realloc(database, (dbSize - 1) * sizeof(TVShow**)); // removes last row
      }
      dbSize--;
 }
@@ -197,11 +199,11 @@ void compressValuesDB(){
             if(database[i][j] != NULL){
                 temp[arrayIndex] = database[i][j];
                 arrayIndex++;
-                database[i][j] = NULL;
+                database[i][j] = NULL; // puts NULL were we converted
             }
         }
     }
-    compressDB();
+    compressDB(); // compress the DB
     arrayIndex = 0;
     for (int i = 0; i < dbSize; i++){ // convert back to 2d array
         for (int j = 0; j < dbSize; j++){
@@ -274,7 +276,7 @@ int takenSpotsInDB(){
 
 int isStringNumeric(char *s){
     for (int i = 0; i < (int)strlen(s); i++){
-        if (!(s[i] >= '0' && s[i] <= '9')){
+        if (!(s[i] >= '0' && s[i] <= '9')){ // check that asci is between 0 and 9 chars
             return 0;
         }
     }
@@ -282,37 +284,37 @@ int isStringNumeric(char *s){
 }
 
 int validLength(char *s){
-    if (s == NULL) return 0;
-    char *temp = (char*)malloc((strlen(s)+1) * sizeof(char));
+    if (s == NULL) return 0; // string is empty
+    char *temp = (char*)malloc((strlen(s)+1) * sizeof(char)); // allocate temp (so we dont ruin *s)
     strcpy(temp,s);
     char *organized;
-    organized = strtok(temp,":");
+    organized = strtok(temp,":"); // get first part (hours)
     int num;
     if (organized == NULL){
         free(temp);
         return 0;
     }
-    if (strlen(organized) != 2) {
+    if (strlen(organized) != NUMBER_OF_LENGTH) { // has to be XX
         free(temp);
         return 0;
     }
-    if (!isStringNumeric(organized)){
+    if (!isStringNumeric(organized)){ // has to be number (also safety for atio)
         free(temp);
         return 0;
     }
     
     num = atoi(organized);
-    if(!(num >= 0 && num < 100)){
+    if(!(num >= 0 && num < NUMBER_OF_HOURS)){ // make sure its (0,99)
         free(temp);
         return 0;
     }
 
-    organized = strtok(NULL, ":");
+    organized = strtok(NULL, ":"); // second part (minutes)
     if (organized == NULL){
         free(temp);
         return 0;
     }
-    if (strlen(organized) != 2){
+    if (strlen(organized) != NUMBER_OF_LENGTH){// XX
         free(temp);
         return 0;
     }
@@ -321,17 +323,17 @@ int validLength(char *s){
         return 0;
     }
     num = atoi(organized);
-    if(!(num >= 0 && num < 60)){
+    if(!(num >= 0 && num < NUMBER_OF_MINUTES_SECOND)){ // make sure its (0,59)
         free(temp);
         return 0;
     }
 
-    organized = strtok(NULL, ":");
+    organized = strtok(NULL, ":"); // third part (seconds) etc..
     if (organized == NULL){
         free(temp);
         return 0;
     }
-    if (strlen(organized) != 2){
+    if (strlen(organized) != NUMBER_OF_LENGTH){
         free(temp);
         return 0;
     }
@@ -340,7 +342,7 @@ int validLength(char *s){
         return 0;
     }
     num = atoi(organized);
-    if(!(num >= 0 && num < 60)){
+    if(!(num >= 0 && num < NUMBER_OF_MINUTES_SECOND)){
             free(temp);
         return 0;
     }
@@ -360,7 +362,7 @@ void printArray(){
             if(database[i][j] != NULL){
                 printf("[%s] ", database[i][j] ->name);
             }else{
-                printf("[NULL] ");
+                printf("[NULL] "); // incase empty
             }
         }
         printf("\n");
@@ -371,7 +373,7 @@ void printArray(){
 TVShow *findShow(char *name){
     for(int i = 0; i <dbSize; i++){
         for (int j =0; j < dbSize; j++){
-            if(database[i][j] != NULL && strcmp(database[i][j] -> name, name) == 0){
+            if(database[i][j] != NULL && strcmp(database[i][j] -> name, name) == 0){ // make sure we dont try taking info from NULL
                 return database[i][j];
             }
         }
@@ -382,17 +384,17 @@ TVShow *findShow(char *name){
 void addShow(){
     char* name = NULL;
     printf("Enter the name of the show:\n");
-    name = getString();
+    name = getString(); // input
     if (findShow(name) != NULL){
         printf("Show already exists.\n");
         free(name);
         return;
     }
-    TVShow* pshow = (TVShow*)malloc(sizeof(TVShow));
+    TVShow* pshow = (TVShow*)malloc(sizeof(TVShow)); // allocate our new show
     pshow ->name = name;
     pshow -> seasons = NULL;
     int foundSpot = 0;
-    if (isDBFull()){
+    if (isDBFull()){ // check if we need to take action on DB
         expandDB();
         sortLexiDB();
     }
@@ -404,7 +406,7 @@ void addShow(){
                 }
             }
     }
-    sortLexiDB();
+    sortLexiDB(); // make sure we sort it
 }
 void deleteShow(){
     char* name = NULL;
@@ -419,12 +421,12 @@ void deleteShow(){
         for (int j = 0; j < dbSize; j++){
             if (database[i][j] != NULL && strcmp(database[i][j] -> name, name) == 0)
             {
-                freeShow(database[i][j]);
+                freeShow(database[i][j]); // free the pointer
                 database[i][j] = NULL;
-                if (takenSpotsInDB() == (dbSize - 1) * (dbSize - 1)){
+                if (takenSpotsInDB() == (dbSize - 1) * (dbSize - 1)){ // check if DB needed action
                     compressValuesDB();
                 }  
-                sortLexiDB();
+                sortLexiDB(); // sort...
                 free(name);
                 return;
             }
@@ -446,12 +448,12 @@ void printShow(){
     TVShow *show = findShow(nameshow);
     printf("Name: %s\n", nameshow);
     free(nameshow);
-    Season *seasonrunner = show -> seasons;
+    Season *seasonrunner = show -> seasons; // set a runner for out list
     printf("Seasons:\n");
     for(int i = 0; seasonrunner != NULL; i++){
        
         printf("\tSeason %d: %s\n", i, seasonrunner->name);
-        Episode* episoderunner = seasonrunner -> episodes;
+        Episode* episoderunner = seasonrunner -> episodes; // set a runner for episode list
         for(int j =0; episoderunner != NULL; j++){
             printf("\t\tEpisode %d: %s (%s)\n", j,episoderunner -> name, episoderunner -> length);
             episoderunner = episoderunner -> next;
@@ -498,23 +500,23 @@ void addSeason(){
     scanf("%d", &pos);
     getchar();
 
-    Season* newseason = (Season*)malloc(sizeof(Season));
+    Season* newseason = (Season*)malloc(sizeof(Season));// allocate our new season
     newseason -> episodes = NULL;
     newseason -> name = nameseason;
     newseason -> next = NULL;
-    if(pshow -> seasons == NULL){
+    if(pshow -> seasons == NULL){ // if list is empty
         pshow -> seasons = newseason;
         return;
     }
 
-    if(pos == 0){
+    if(pos == 0){ // if needed to be first in list
         newseason -> next = pshow ->seasons;
         pshow -> seasons = newseason;
         return;
     }
 
     Season* currSeason = pshow -> seasons;
-    for (int i =0; i < pos - 1 && currSeason -> next != NULL; i++){
+    for (int i =0; i < pos - 1 && currSeason -> next != NULL; i++){ // go until one before pos
         currSeason = currSeason -> next;
     }
     newseason -> next = currSeason -> next;
@@ -546,20 +548,20 @@ void deleteSeason(){
         Season* temp = pshow -> seasons;
         pshow -> seasons = pshow -> seasons -> next;
 
-        freeEpisode(temp -> episodes);
+        freeEpisode(temp -> episodes); // make sure we completly free it
         free(temp -> name);
         free(temp);
         free(nameseason);
         return;
     }
     Season* currSeason = pshow -> seasons;
-    while(currSeason->next != NULL && strcmp(currSeason -> next -> name, nameseason) != 0){
+    while(currSeason->next != NULL && strcmp(currSeason -> next -> name, nameseason) != 0){ // go until found
         currSeason = currSeason -> next;
     }
     Season* temp = currSeason -> next;
     currSeason -> next = temp -> next;
 
-    freeEpisode(temp -> episodes);
+    freeEpisode(temp -> episodes); // free comletly...
     free(temp -> name);
     free(temp);
     free(nameseason);
@@ -623,23 +625,23 @@ void addEpisode(){
     scanf("%d", &pos);
     getchar();
 
-    Episode* newepisode = (Episode*)malloc(sizeof(Episode));
+    Episode* newepisode = (Episode*)malloc(sizeof(Episode)); // allocate new episode
     newepisode -> name = nameepisode;
     newepisode -> length = episodelength;
     newepisode -> next = NULL;
-    if(season -> episodes == NULL){
+    if(season -> episodes == NULL){ // if list empty
         season -> episodes = newepisode;
         return;
     }
 
-    if(pos == 0){
+    if(pos == 0){ // new episode first in list
         newepisode -> next = season -> episodes;
         season -> episodes = newepisode;
         return;
     }
 
     Episode* currEpisode = season -> episodes;
-    for (int i = 0; i < pos - 1 && currEpisode -> next != NULL; i++){
+    for (int i = 0; i < pos - 1 && currEpisode -> next != NULL; i++){ // go one before pos
         currEpisode = currEpisode -> next;
     }
     newepisode -> next = currEpisode -> next;
@@ -678,22 +680,22 @@ void deleteEpisode(){
         return;
     }
 
-    if (strcmp(season -> episodes -> name, nameepisode) == 0){
+    if (strcmp(season -> episodes -> name, nameepisode) == 0){ // deleted is first
         Episode* temp = season -> episodes;
         season -> episodes = season -> episodes -> next;
-        free(temp->name);
+        free(temp->name); // completly free it
         free(temp->length);
         free(temp);
         free(nameepisode);
         return;
     }
     Episode* currEpisode = season -> episodes;
-    while(currEpisode->next != NULL && strcmp(currEpisode -> next -> name, nameepisode) != 0){
+    while(currEpisode->next != NULL && strcmp(currEpisode -> next -> name, nameepisode) != 0){ // go until found
         currEpisode = currEpisode -> next;
     }
     Episode* temp = currEpisode -> next;
     currEpisode -> next = temp -> next;
-    free(temp->name);
+    free(temp->name); // completly free
     free(temp->length);
     free(temp);
     free(nameepisode);
@@ -743,7 +745,7 @@ void freeEpisode(Episode *e){
 
     while(current != NULL){
         nextEpisode = current -> next;
-        free(current -> name);
+        free(current -> name); // free all the attributes
         free(current -> length);
         free(current);
         current = nextEpisode;
@@ -755,14 +757,14 @@ void freeSeason(Season *s){
 
     while(current != NULL){
         nextSeason = current -> next;
-        freeEpisode(current -> episodes);
+        freeEpisode(current -> episodes); // make sure we free attributes and the episodes
         free(current -> name);
         free(current);
         current = nextSeason;
     }
 }
 void freeShow(TVShow *t){
-    freeSeason(t -> seasons);
+    freeSeason(t -> seasons); // just free everything around it
     free(t -> name);
     free(t);
 }
@@ -776,7 +778,7 @@ void freeAll(){
         }
         free(database[i]);
     }
-    if(database!= NULL){
+    if(database!= NULL){ // make sure we free it
         free(database);
         database = NULL;
     }
