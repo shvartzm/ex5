@@ -490,7 +490,7 @@ void addSeason(){
     printf("Enter the name of the season:\n");
     nameseason = getString();
     if(findSeason(pshow,nameseason) != NULL){
-        printf("Season already exits.\n");
+        printf("Season already exists.\n");
         free(nameseason);
         return;
     }
